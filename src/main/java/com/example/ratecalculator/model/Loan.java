@@ -21,7 +21,7 @@ public class Loan {
 
 	public void setBorrower(Borrower borrower) {
 		if (borrower == null) {
-			throw new IllegalArgumentException("attempt to create Loan with null Borrower");
+			throw new IllegalArgumentException("Attempt to create Loan with null Borrower");
 		}
 		this.borrower = borrower;
 	}
@@ -36,7 +36,7 @@ public class Loan {
 
 	public void addLender(Lender lender) {
 		if (lender == null) {
-			throw new IllegalArgumentException("attempt to add null Lender to Loan");
+			throw new IllegalArgumentException("Attempt to add null Lender to Loan");
 		}
 		if (lenders == null) {
 			lenders = new ArrayList<Lender>();

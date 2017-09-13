@@ -5,7 +5,17 @@ import org.junit.Test;
 public class BorrowerTest {
 
 	@Test(expected = IllegalArgumentException.class)
-	public void createBorrowerWithZeroAmountShouldThrowIllegalArgumentException() {
-		Borrower borrower = new Borrower(0);
+	public void createBorrowerWithAmountBelow1000PoundsShouldThrowIllegalArgumentException() {
+		Borrower borrower = new Borrower(999);
+	}
+	
+	@Test(expected = IllegalArgumentException.class)
+	public void createBorrowerWithAmountAbove15000PoundsShouldThrowIllegalArgumentException() {
+		Borrower borrower = new Borrower(15001);
+	}
+	
+	@Test(expected = IllegalArgumentException.class)
+	public void createBorrowerWithAmountNotDivisableBy100PoundsShouldThrowIllegalArgumentException() {
+		Borrower borrower = new Borrower(7050);
 	}
 }

@@ -32,7 +32,7 @@ public class RatecalculatorApplication implements CommandLineRunner {
 	public void run(String... args) {
 
 		if (args.length < 2) {
-			output("useage: java -jar ratecalculator-0.0.1-SNAPSHOT.jar <lenders-file.csv> <loan-amount>");
+			output("Usage: java -jar ratecalculator-0.0.1-SNAPSHOT.jar <lenders-file.csv> <loan-amount>");
 			return;
 		}
 
@@ -52,21 +52,21 @@ public class RatecalculatorApplication implements CommandLineRunner {
 			int loanAmount = Integer.valueOf(args[1]);
 			borrower = new Borrower(loanAmount);
 		} catch (IllegalArgumentException e) {
-			output("Error initiating ratecalculator - <loan-amount> must be a non-zero integer: " + e.getMessage());
+			output("Loan amount must be the loan in pounds, greater than £1000, less than £15000, in £100 increments");
+			output(e.getMessage());
 			System.exit(1);
 		}		
 
 		// double check the initial setup
 		if (lenders == null || borrower == null) {
-			output("Error initiating ratecalculator - unable to initialise lenders list or borrower");
+			output("Unable to initialise lenders list or borrower");
 			System.exit(1);
-			
 		}
 		
 		// check we can provide the loan
 		int amountAvailable = loanService.getTotalAmountAvailable(lenders);
 		if (amountAvailable < borrower.getAmount()) {
-			output("Is is not possible to provide a quote at this time");
+			output("It is not possible to provide a quote at this time");
 			LOG.debug("loan of {} not available, max loan with these lenders is {}", borrower.getAmount(), amountAvailable);
 			return;
 		}

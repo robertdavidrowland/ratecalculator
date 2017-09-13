@@ -17,10 +17,10 @@ public class Lender {
 
 	public void setName(String name) {
 		if (name == null) {
-			throw new IllegalArgumentException("attempt to create Lender with null value for name");
+			throw new IllegalArgumentException("Attempt to create Lender with null value for name");
 		}
 		else if (name.equals("")) {
-			throw new IllegalArgumentException("attempt to create Lender with empty string value for name");
+			throw new IllegalArgumentException("Attempt to create Lender with empty string value for name");
 		}
 		this.name = name;
 	}
@@ -31,7 +31,7 @@ public class Lender {
 
 	public void setRate(double rate) {
 		if (rate == 0.0) {
-			throw new IllegalArgumentException("attempt to create Lender with 0.0 value for rate");
+			throw new IllegalArgumentException("Attempt to create Lender with 0.0 value for rate");
 		}
 		this.rate = rate;
 	}
@@ -42,7 +42,7 @@ public class Lender {
 
 	public void setAvailable(int available) {
 		if (available == 0) {
-			throw new IllegalArgumentException("attempt to create Lender with 0 value for available");
+			throw new IllegalArgumentException("Attempt to create Lender with 0 value for available");
 		}
 		this.available = available;
 	}

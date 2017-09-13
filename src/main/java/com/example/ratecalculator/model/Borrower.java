@@ -12,8 +12,14 @@ public class Borrower {
 	}
 
 	public void setAmount(int amount) {
-		if (amount == 0) {
-			throw new IllegalArgumentException("attempt to create Borrower with 0 value for amount");
+		if (amount < 1000) {
+			throw new IllegalArgumentException(String.format("Attempt to create Borrower amount with value < 1000 (%d)", amount));
+		}
+		else if (amount > 15000) {
+			throw new IllegalArgumentException(String.format("Attempt to create Borrower amount with value > 15000 (%d)", amount));
+		}
+		else if (amount % 100 != 0) {
+			throw new IllegalArgumentException(String.format("Attempt to create Borrower amount with value not divisible by zero (%d)", amount));
 		}
 		this.amount = amount;
 	}

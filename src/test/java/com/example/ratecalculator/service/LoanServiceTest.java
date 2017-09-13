@@ -18,9 +18,9 @@ public class LoanServiceTest {
 	@Test
 	public void createSimpleLoanFromSingleLender() {
 		
-		Borrower borrower = new Borrower(10);
+		Borrower borrower = new Borrower(1000);
 		List<Lender> lenders = new ArrayList<>();
-		lenders.add(new Lender("Mark", 8.0, 10));
+		lenders.add(new Lender("Mark", 8.0, 1000));
 		
 		Loan loan = service.createBestLoan(borrower, lenders);
 		
@@ -31,10 +31,10 @@ public class LoanServiceTest {
 	@Test
 	public void createLoanFromMultipleIdealLenders() {
 		
-		Borrower borrower = new Borrower(20);
+		Borrower borrower = new Borrower(3000);
 		List<Lender> lenders = new ArrayList<>();
-		lenders.add(new Lender("Phil", 9.0, 20));
-		lenders.add(new Lender("Mark", 8.0, 10));
+		lenders.add(new Lender("Phil", 9.0, 2000));
+		lenders.add(new Lender("Mark", 8.0, 1000));
 		
 		Loan loan = service.createBestLoan(borrower, lenders);
 		
@@ -46,11 +46,11 @@ public class LoanServiceTest {
 	@Test
 	public void createLoanFromMultipleLenders() {
 		
-		Borrower borrower = new Borrower(20);
+		Borrower borrower = new Borrower(2000);
 		List<Lender> lenders = new ArrayList<>();
-		lenders.add(new Lender("Phil", 9.0, 20));
-		lenders.add(new Lender("Tracy", 10.0, 30));
-		lenders.add(new Lender("Mark", 8.0, 10));
+		lenders.add(new Lender("Phil", 9.0, 2000));
+		lenders.add(new Lender("Tracy", 10.0, 3000));
+		lenders.add(new Lender("Mark", 8.0, 1000));
 		
 		Loan loan = service.createBestLoan(borrower, lenders);
 		
@@ -63,12 +63,12 @@ public class LoanServiceTest {
 	public void getTotalAmountAvailable() {
 		
 		List<Lender> lenders = new ArrayList<>();
-		lenders.add(new Lender("Phil", 9.0, 20));
-		lenders.add(new Lender("Tracy", 10.0, 30));
-		lenders.add(new Lender("Mark", 8.0, 10));
+		lenders.add(new Lender("Phil", 9.0, 2000));
+		lenders.add(new Lender("Tracy", 10.0, 3000));
+		lenders.add(new Lender("Mark", 8.0, 1000));
 		
 		int totalAmount = service.getTotalAmountAvailable(lenders);
-		assertEquals(60, totalAmount);
+		assertEquals(6000, totalAmount);
 		
 	}
 }
