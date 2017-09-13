@@ -1,4 +1,4 @@
-# Zopa Technical Test
+# Calculating loan rates
 
 ## Overview
 
@@ -11,7 +11,7 @@ by the lenders within the system in CSV format, see the example market.csv file
 provided alongside this specification.
 
 You should strive to provide as low a rate to the borrower as is possible to
-ensure that Zopa's quotes are as competitive as they can be against our
+ensure that quotes are as competitive as they can be against our
 competitors'. You should also provide the borrower with the details of the
 monthly repayment amount and the total repayment amount.
 
@@ -46,20 +46,12 @@ Example:
     Rate: 7.0%
     Monthly repayment: £30.78
     Total repayment: £1108.10
-
-## Remarks
  
- * We do not mind what language you chose for your implementation
- * The monthly and total repayment should use monthly compounding interest
- * We will review your code and run it against some other test cases to see how
-   it handles them
- * If you have any questions then don't hesitate to contact us
- 
- ## Implementation details
+## Implementation details
 
 This has been set up as Spring Boot project using Java 8 features.  The application is built with Maven.
 
-## Example
+## Usage
 
 ```
 > mvn package
