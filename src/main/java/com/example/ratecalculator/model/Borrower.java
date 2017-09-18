@@ -2,19 +2,21 @@ package com.example.ratecalculator.model;
 
 import java.math.BigDecimal;
 
-public class Borrower {
-	private BigDecimal amount;
+public final class Borrower {
+	
+	final private BigDecimal amount;
 
 	public Borrower(BigDecimal amount) {
-		this.setAmount(amount);
+		checkAmount(amount);
+		this.amount = amount;
 	}
 	
 	public Borrower(String amount) {
-		this.setAmount(new BigDecimal(amount));
+		this(new BigDecimal(amount));
 	}
 	
 	public Borrower(int amount) {
-		this.setAmount(new BigDecimal(String.valueOf(amount)));
+		this(new BigDecimal(String.valueOf(amount)));
 	}
 	
 	public BigDecimal getAmount() {
@@ -25,7 +27,7 @@ public class Borrower {
 		return String.format("£%.2f", amount);
 	}
 	
-	public void setAmount(BigDecimal amount) {
+	public void checkAmount(BigDecimal amount) {
 		if (amount.intValue() < 1000) {
 			throw new IllegalArgumentException(String.format("Attempt to create Borrower amount with value < 1000 (%d)", amount.intValue()));
 		}
@@ -35,6 +37,5 @@ public class Borrower {
 		else if (amount.intValue() % 100 != 0) {
 			throw new IllegalArgumentException(String.format("Attempt to create Borrower amount with value not divisible by zero (%d)", amount.intValue()));
 		}
-		this.amount = amount;
 	}
 }

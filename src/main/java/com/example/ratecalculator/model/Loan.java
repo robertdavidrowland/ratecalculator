@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import com.example.ratecalculator.RatecalculatorApplication;
 
-public class Loan {
+public final class Loan {
 	
     private static final Logger LOG = LoggerFactory.getLogger(RatecalculatorApplication.class);
 
@@ -17,42 +17,37 @@ public class Loan {
 	private static int CURRENCY_DECIMALS = 2;
 	private static int PERCENTAGE_DECIMALS = 4;
 	
-	private List<Lender> lenders;
-	private Borrower borrower;
-	private BigDecimal rate;
-	private BigDecimal totalRepayments;
-	private BigDecimal monthyRepayments;
+	private final List<Lender> lenders = new ArrayList<Lender>();
+	private final Borrower borrower;
+	
+	private BigDecimal rate = new BigDecimal("0.0000");
+	private BigDecimal totalRepayments = new BigDecimal("0.00");
+	private BigDecimal monthyRepayments = new BigDecimal("0.00");
 
 	public Loan(Borrower borrower) {
-		this.setBorrower(borrower);
+		checkLoan(borrower);
+		this.borrower = borrower;
 	}
 	
-	public Borrower getBorrower() {
-		return borrower;
-	}
-
-	public void setBorrower(Borrower borrower) {
+	private void checkLoan(Borrower borrower) {
 		if (borrower == null) {
 			throw new IllegalArgumentException("Attempt to create Loan with null Borrower");
-		}
-		this.borrower = borrower;
+		}	
+	}
+
+	public Borrower getBorrower() {
+		return borrower;
 	}
 	
 	public List<Lender> getLenders() {
 		return lenders;
 	}
 
-	public void setLenders(List<Lender> lenders) {
-		this.lenders = lenders;
-	}
-
 	public void addLender(Lender lender) {
 		if (lender == null) {
 			throw new IllegalArgumentException("Attempt to add null Lender to Loan");
 		}
-		if (lenders == null) {
-			lenders = new ArrayList<Lender>();
-		}
+
 		lenders.add(lender);
 	} 
 
@@ -64,20 +59,12 @@ public class Loan {
 		return String.format("%%%.2f", rate.multiply(new BigDecimal("100")));
 	}
 	
-	public void setRate(BigDecimal rate) {
-		this.rate = rate;
-	}
-	
 	public BigDecimal getTotalRepayements() {
 		return totalRepayments;
 	}
 
 	public String getPrettyTotalRepayements() {		
 		return String.format("£%.2f", totalRepayments);
-	}
-	
-	public void setTotalRepayements(BigDecimal totalRepayments) {
-		this.totalRepayments = totalRepayments;
 	}
 
 	public BigDecimal getMonthyRepayements() {
@@ -86,11 +73,6 @@ public class Loan {
 
 	public String getPrettyMonthyRepayements() {
 		return String.format("£%.2f", monthyRepayments);
-	}
-	
-	public void setMonthyRepayements(BigDecimal monthyRepayments) {
-		monthyRepayments.setScale(CURRENCY_DECIMALS, ROUNDING_MODE);
-		this.monthyRepayments = monthyRepayments;
 	}
 
 	public void calculateRepayments(int totalMonths) {
@@ -158,9 +140,9 @@ public class Loan {
 		LOG.debug("monthyRepayments {}", monthyRepayments);
 
 		// set values on this object, rounding to 2dp
-		this.setRate(totalCompoundRate.setScale(PERCENTAGE_DECIMALS, ROUNDING_MODE));
-		this.setTotalRepayements(totalRepayments.setScale(CURRENCY_DECIMALS, ROUNDING_MODE));
-		this.setMonthyRepayements(monthyRepayments.setScale(CURRENCY_DECIMALS, ROUNDING_MODE));
+		this.rate = totalCompoundRate.setScale(PERCENTAGE_DECIMALS, ROUNDING_MODE);
+		this.totalRepayments = totalRepayments.setScale(CURRENCY_DECIMALS, ROUNDING_MODE);
+		this.monthyRepayments = monthyRepayments.setScale(CURRENCY_DECIMALS, ROUNDING_MODE);
 		
 		LOG.debug("rate {}", this.getRate());
 		LOG.debug("totalRepayments {}", this.getTotalRepayements());
