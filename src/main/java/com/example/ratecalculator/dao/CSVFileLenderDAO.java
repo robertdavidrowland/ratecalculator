@@ -41,10 +41,10 @@ public class CSVFileLenderDAO {
 						LOG.debug("parse line {}", l);
 						String[] v = l.split(COMMA);
 						try {
-							return new Lender(v[0], Double.valueOf(v[1]), Integer.valueOf(v[2]));
+							return new Lender(v[0], String.valueOf(v[1]), String.valueOf(v[2]));
 						} 
 						catch (ArrayIndexOutOfBoundsException e) {
-							LOG.debug("error: expected 3 columns, only found {}", v.length);
+							LOG.debug("error: {} expected 3 columns, only found {}", e.getMessage(), v.length);
 						} 
 						catch (IllegalArgumentException e) {
 							LOG.debug("error: {}", e.getMessage());

@@ -22,6 +22,8 @@ public class RatecalculatorApplication implements CommandLineRunner {
 
     private static final Logger LOG = LoggerFactory.getLogger(RatecalculatorApplication.class);
 
+    private static final int DEFAULT_MONTHS = 36;
+    
     @Autowired
     CSVFileLenderDAO lenderDAO;
     
@@ -63,19 +65,17 @@ public class RatecalculatorApplication implements CommandLineRunner {
 			System.exit(1);
 		}
 		
-		// check we can provide the loan
-		int amountAvailable = loanService.getTotalAmountAvailable(lenders);
-		if (amountAvailable < borrower.getAmount()) {
-			output("It is not possible to provide a quote at this time");
-			LOG.debug("loan of {} not available, max loan with these lenders is {}", borrower.getAmount(), amountAvailable);
-			return;
+		// get optional value for number of months
+		int months = DEFAULT_MONTHS;
+		if (args.length > 2) {
+			months = Integer.valueOf(args[2]);
 		}
 
 		// set up loan and calculate
 		Loan loan = loanService.createBestLoan(borrower, lenders);
-		loan.calculateRepayments(36);
+		loan.calculateRepayments(months);
 		
-		output(String.format("Requested amount: £%d", borrower.getAmount()));
+		output(String.format("Requested amount: %s", borrower.getPrettyAmount()));
 		output(String.format("Rate: %s", loan.getPrettyRate()));
 		output(String.format("Monthly repayment: %s", loan.getPrettyMonthyRepayements()));
 		output(String.format("Total repayment: %s", loan.getPrettyTotalRepayements()));		

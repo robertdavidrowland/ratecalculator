@@ -1,15 +1,27 @@
 package com.example.ratecalculator.model;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.example.ratecalculator.RatecalculatorApplication;
+
 public class Loan {
-			
+	
+    private static final Logger LOG = LoggerFactory.getLogger(RatecalculatorApplication.class);
+
+	private static int ROUNDING_MODE = BigDecimal.ROUND_HALF_EVEN;
+	private static int CURRENCY_DECIMALS = 2;
+	private static int PERCENTAGE_DECIMALS = 4;
+	
 	private List<Lender> lenders;
 	private Borrower borrower;
-	private double rate;
-	private double totalRepayements;
-	private double monthyRepayements;
+	private BigDecimal rate;
+	private BigDecimal totalRepayments;
+	private BigDecimal monthyRepayments;
 
 	public Loan(Borrower borrower) {
 		this.setBorrower(borrower);
@@ -44,94 +56,114 @@ public class Loan {
 		lenders.add(lender);
 	} 
 
-	public double getRate() {
+	public BigDecimal getRate() {
 		return rate;
 	}
 
 	public String getPrettyRate() {
-		return String.format("%%%.2f", rate * 100);
+		return String.format("%%%.2f", rate.multiply(new BigDecimal("100")));
 	}
 	
-	public void setRate(double rate) {
+	public void setRate(BigDecimal rate) {
 		this.rate = rate;
 	}
-
-	public double getTotalRepayements() {
-		return totalRepayements;
+	
+	public BigDecimal getTotalRepayements() {
+		return totalRepayments;
 	}
 
 	public String getPrettyTotalRepayements() {		
-		return String.format("£%.2f", totalRepayements);
+		return String.format("£%.2f", totalRepayments);
 	}
 	
-	public void setTotalRepayements(double totalRepayements) {
-		this.totalRepayements = totalRepayements;
+	public void setTotalRepayements(BigDecimal totalRepayments) {
+		this.totalRepayments = totalRepayments;
 	}
 
-	public double getMonthyRepayements() {
-		return monthyRepayements;
+	public BigDecimal getMonthyRepayements() {
+		return monthyRepayments;
 	}
 
 	public String getPrettyMonthyRepayements() {
-		return String.format("£%.2f", monthyRepayements);
+		return String.format("£%.2f", monthyRepayments);
 	}
 	
-	public void setMonthyRepayements(double monthyRepayements) {
-		this.monthyRepayements = monthyRepayements;
+	public void setMonthyRepayements(BigDecimal monthyRepayments) {
+		monthyRepayments.setScale(CURRENCY_DECIMALS, ROUNDING_MODE);
+		this.monthyRepayments = monthyRepayments;
 	}
 
 	public void calculateRepayments(int totalMonths) {
 		
-		int totalAmount = 0;
-		int totalRequired = this.getBorrower().getAmount();
+		BigDecimal totalAmount = new BigDecimal("0");
+		BigDecimal totalRequired = this.getBorrower().getAmount();
 
-		double totalRepayements = 0;
-		double totalLoaned = 0;
+		BigDecimal totalRepayments = new BigDecimal("0");
 		
 		for (Lender lender: this.getLenders()) {
 			// loan amount from this lender
-			int amount = lender.getAvailable();
-			if (totalAmount + amount > totalRequired){
-				amount = totalRequired - totalAmount;
+			BigDecimal amount = lender.getAvailable();
+			if (totalAmount.add(amount).compareTo(totalRequired) > 0){
+				amount = totalRequired.subtract(totalAmount);
 			}
 			
-			totalAmount += amount;
+			totalAmount = totalAmount.add(amount);
+			
+			LOG.debug("Lender {} lends {}, total lent now {}", lender.getName(), amount, totalAmount);
+			LOG.debug("Yearly rate from {} is {}", lender.getName(), lender.getRate());
 			
 			// calculate monthly rate from this lender
-			double rate = lender.getRate();
-			double monthlyRate = rate / 12;
+			BigDecimal rate = lender.getRate();
+			BigDecimal monthlyRate = rate.divide(new BigDecimal("12"), PERCENTAGE_DECIMALS, ROUNDING_MODE);
 			if (totalMonths < 12) {
-				monthlyRate = rate / totalMonths;
+				monthlyRate = rate.divide(new BigDecimal(String.valueOf(totalMonths)), PERCENTAGE_DECIMALS, ROUNDING_MODE);
 			}
 
+			LOG.debug("Monthly rate from {} is {}", lender.getName(), monthlyRate);
+
 			// calculate repayments to this lender
-			double repayements = amount;
+			BigDecimal repayments = amount;
 	        for(int i=0; i < totalMonths; i++) {
-	        	repayements = repayements + repayements * monthlyRate;
+	        	repayments = repayments.add(repayments.multiply(monthlyRate));
+				LOG.debug("Compound repayments from {} after {} months is {}", lender.getName(), i + 1, repayments);
 	        }
 	        
-	        // total repayments
-	        totalRepayements += repayements;
+			LOG.debug("Compound repayments from {} is {}", lender.getName(), repayments);
 	        
+	        // total repayments
+	        totalRepayments = totalRepayments.add(repayments);
+
+			LOG.debug("totalRepayments is now {}", totalRepayments);
+
+			LOG.debug("totalAmount {} == totalRequired {}", totalAmount, totalRequired);
+
 	        // have we got everything we need here
 	        if (totalAmount == totalRequired) {
+				LOG.debug("{} == {} so we have all the loan - break", totalAmount, totalRequired);
 	        	break;
 	        }
 		}
 
 		// calculate compound rate and monthly repayments from total repayments and total loan amount
-        double totalCompoundRate = ((totalRepayements - totalAmount) / totalAmount);        
-		double compoundRate = totalCompoundRate / totalMonths * 12;
-		if (totalMonths < 12) {
-			compoundRate = totalCompoundRate;
+		BigDecimal totalCompoundRate = totalRepayments.subtract(totalAmount).divide(totalAmount, PERCENTAGE_DECIMALS, ROUNDING_MODE);
+		if (totalMonths > 12) {
+			totalCompoundRate = totalRepayments.subtract(totalAmount).divide(new BigDecimal(totalMonths), PERCENTAGE_DECIMALS, ROUNDING_MODE).multiply(new BigDecimal(12)).divide(totalAmount, PERCENTAGE_DECIMALS, ROUNDING_MODE);
 		}
-        
-		// monthly repayments straight forward
-        double monthyRepayements = totalRepayements / totalMonths;
 		
+		LOG.debug("totalCompoundRate {}", totalCompoundRate);
+
+		// monthly repayments straight forward
+		BigDecimal monthyRepayments = totalRepayments.divide(new BigDecimal(String.valueOf(totalMonths)), CURRENCY_DECIMALS, ROUNDING_MODE);
+
+		LOG.debug("monthyRepayments {}", monthyRepayments);
+
 		// set values on this object, rounding to 2dp
-		this.setRate((double) Math.round(compoundRate * 10000d) / 10000d);
-		this.setTotalRepayements((double) Math.round(totalRepayements * 100d) / 100d);
-		this.setMonthyRepayements((double) Math.round(monthyRepayements * 100d) / 100d);
+		this.setRate(totalCompoundRate.setScale(PERCENTAGE_DECIMALS, ROUNDING_MODE));
+		this.setTotalRepayements(totalRepayments.setScale(CURRENCY_DECIMALS, ROUNDING_MODE));
+		this.setMonthyRepayements(monthyRepayments.setScale(CURRENCY_DECIMALS, ROUNDING_MODE));
+		
+		LOG.debug("rate {}", this.getRate());
+		LOG.debug("totalRepayments {}", this.getTotalRepayements());
+		LOG.debug("monthyRepayments {}", this.getMonthyRepayements());
 	}
 }

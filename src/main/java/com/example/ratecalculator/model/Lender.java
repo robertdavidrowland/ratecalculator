@@ -1,16 +1,25 @@
 package com.example.ratecalculator.model;
 
+import java.math.BigDecimal;
+
 public class Lender {
-	private String name;
-	private double rate;
-	private int	available;
 	
-	public Lender(String name, double rate, int available) {
+	private String name;
+	private BigDecimal rate;
+	private BigDecimal available;
+	
+	public Lender(String name, BigDecimal rate, BigDecimal available) {
 		this.setName(name);
 		this.setRate(rate);
 		this.setAvailable(available);
 	}
 
+	public Lender(String name, String rate, String available) {
+		this.setName(name);
+		this.setRate(rate);
+		this.setAvailable(available);
+	}
+	
 	public String getName() {
 		return name;
 	}
@@ -25,25 +34,33 @@ public class Lender {
 		this.name = name;
 	}
 
-	public double getRate() {
+	public BigDecimal getRate() {
 		return rate;
 	}
 
-	public void setRate(double rate) {
-		if (rate == 0.0) {
+	public void setRate(BigDecimal rate) {
+		if (rate.doubleValue() == 0.0) {
 			throw new IllegalArgumentException("Attempt to create Lender with 0.0 value for rate");
 		}
 		this.rate = rate;
 	}
 
-	public int getAvailable() {
+	public void setRate(String rate) {
+		this.setRate(new BigDecimal(rate));
+	}
+	
+	public BigDecimal getAvailable() {
 		return available;
 	}
 
-	public void setAvailable(int available) {
-		if (available == 0) {
+	public void setAvailable(BigDecimal available) {
+		if (available.intValue() == 0) {
 			throw new IllegalArgumentException("Attempt to create Lender with 0 value for available");
 		}
-		this.available = available;
+		this.available = available;;
+	}
+	
+	public void setAvailable(String available) {
+		this.setAvailable(new BigDecimal(available));
 	}
 }

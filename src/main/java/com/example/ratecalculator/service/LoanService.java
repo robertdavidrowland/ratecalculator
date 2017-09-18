@@ -1,5 +1,6 @@
 package com.example.ratecalculator.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -16,30 +17,29 @@ public class LoanService {
 		Loan loan = new Loan(borrower);
 
 		// order possible loans by rate, best rate first
-		lenders.sort((Lender o1, Lender o2) -> Double.valueOf(o1.getRate()).compareTo(Double.valueOf(o2.getRate())));
+		lenders.sort((Lender o1, Lender o2) -> o1.getRate().compareTo(o2.getRate()));
 		
 		// iterate through possible loans until we have enough to cover the borrower amount
-		int totalRequired = borrower.getAmount();
+		BigDecimal totalRequired = borrower.getAmount();
 		for(Lender lender: lenders) {
-			int amountAvailable = lender.getAvailable();
+			BigDecimal amountAvailable = lender.getAvailable();
 			
-			totalRequired -= amountAvailable;
+			totalRequired = totalRequired.subtract(amountAvailable);
 			loan.addLender(lender);
 
-			if (totalRequired <= 0) {
+			if (totalRequired.intValue() <= 0) {
 				break;				
 			}
 		}
 
-		if (totalRequired <= 0) {
+		if (totalRequired.intValue() <= 0) {
 			return loan;
 		}
-		else {
-			throw new IllegalArgumentException("Not enough lenders to cover loan");
-		}
+		
+		throw new IllegalArgumentException("Not enough lenders to cover loan");
 	}
 
 	public int getTotalAmountAvailable(List<Lender> lenders) {
-		return lenders.stream().mapToInt(o -> o.getAvailable()).sum();
+		return lenders.stream().mapToInt(o -> o.getAvailable().intValue()).sum();
 	}
 }
